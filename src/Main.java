@@ -1,14 +1,8 @@
 import java.lang.String ;
 
 void main() {
-    printThreeWords();
-
-}
-public void printThreeWords(){
     //1.
-    System.out.println("Orange");
-    System.out.println("Banana");
-    System.out.println("Apple");
+    printThreeWords();
     //2.
     checkSumSign(5,-6);
     //3.
@@ -50,8 +44,15 @@ public void printThreeWords(){
     //14. Написать метод, принимающий на вход два аргумента: len и initialValue, и возвращающий одномерный массив типа int длиной len,
     // каждая ячейка которого равна initialValue.
     initMas(10,10);
-}
 
+}
+public void printThreeWords(){
+    //1.
+    System.out.println("Orange");
+    System.out.println("Banana");
+    System.out.println("Apple");
+
+}
 public void checkSumSign(int a, int b){
     int sum = a+b;
     if (sum >= 0) System.out.println("Сумма положительная");
