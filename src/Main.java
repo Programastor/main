@@ -1,3 +1,3 @@
 public void main() {
-    //lesson_3;
+    //lesson_3; изменили
 }
