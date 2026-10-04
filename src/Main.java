@@ -31,7 +31,7 @@ public class Main {
         System.out.println();
 
         for (Cat cat : cats) {
-            System.out.println(cat + " (имя: " + cat.getName() + ") — сыт: " + cat.isFull());
+            System.out.println(cat.getName() + " — сыт: " + cat.isFull());
         }
 
         System.out.println();
