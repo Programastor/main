@@ -1,3 +1,3 @@
-void main () {
-    System.out.println("привет, Глеб");
+void main() {
+    System.out.println("ну вроде разобрался , наконец то ");
 }
