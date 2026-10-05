@@ -1,9 +1,9 @@
 public class Triangle implements Shape {
-    private final String fillColor;
-    private final String borderColor;
-    private final double sideA;
-    private final double sideB;
-    private final double sideC;
+    private String fillColor;
+    private String borderColor;
+    private double sideA;
+    private double sideB;
+    private double sideC;
 
     public Triangle(String fillColor, String borderColor,
                     double sideA, double sideB, double sideC) {

@@ -1,7 +1,7 @@
 public class Circle implements Shape {
-    private final String fillColor;
-    private final String borderColor;
-    private final double radius;
+    private  String fillColor;
+    private  String borderColor;
+    private  double radius;
 
     public Circle(String fillColor, String borderColor, double radius) {
         this.fillColor = fillColor;

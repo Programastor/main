@@ -1,8 +1,8 @@
 public class Rectangle implements Shape {
-    private final String fillColor;
-    private final String borderColor;
-    private final double width;
-    private final double height;
+    private String fillColor;
+    private String borderColor;
+    private double width;
+    private double height;
 
     public Rectangle(String fillColor, String borderColor, double width, double height) {
         this.fillColor = fillColor;
