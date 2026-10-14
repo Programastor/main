@@ -1,16 +1,4 @@
 public class Main {
-    static class MyArraySizeException extends Exception {
-        public MyArraySizeException(String message) {
-            super(message);
-        }
-    }
-
-    static class MyArrayDataException extends Exception {
-        public MyArrayDataException(String message) {
-            super(message);
-        }
-    }
-
     public static int processArray(String[][] array) throws MyArraySizeException, MyArrayDataException {
         if (array.length != 4) {
             throw new MyArraySizeException("Неверный размер массива: количество строк должно быть 4, а получено " + array.length);
