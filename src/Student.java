@@ -1,3 +1,5 @@
+import java.util.Map;
+
 public class Student {
     private String name;
     private int group;
@@ -23,9 +25,8 @@ public class Student {
         this.course = course;
     }
 
-    // Метод для вычисления среднего балла
     public double getAverageGrade() {
-        if (grades.isEmpty()) return 0.0;
+        if (grades == null || grades.isEmpty()) return 0.0;
         int sum = 0;
         for (int grade : grades.values()) {
             sum += grade;
