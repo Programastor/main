@@ -6,16 +6,18 @@ import java.util.Set;
 
 public class Task1 {
 
+    // Метод, который удаляет студентов со средним баллом < 3
     public static void removeLowPerformingStudents(Set<Student> students) {
         Iterator<Student> iterator = students.iterator();
         while (iterator.hasNext()) {
             Student student = iterator.next();
             if (student.getAverageGrade() < 3.0) {
-                iterator.remove();
+                iterator.remove(); // Безопасное удаление через итератор
             }
         }
     }
 
+    // Метод, который переводит студента на следующий курс, если средний балл >= 3
     public static void promoteStudents(Set<Student> students) {
         for (Student student : students) {
             if (student.getAverageGrade() >= 3.0) {
@@ -24,6 +26,7 @@ public class Task1 {
         }
     }
 
+    // Метод printStudents
     public static void printStudents(Set<Student> students, int course) {
         System.out.println("Студенты на курсе " + course + ":");
         boolean found = false;
@@ -42,6 +45,7 @@ public class Task1 {
     public static void main(String[] args) {
         Set<Student> students = new HashSet<>();
 
+        // Создаем студентов с разными оценками
         Map<String, Integer> grades1 = new HashMap<>();
         grades1.put("Math", 5); grades1.put("Physics", 4); // Средний 4.5
         students.add(new Student("Иванов", 101, 1, grades1));
