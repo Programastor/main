@@ -10,4 +10,5 @@ public class Task2 {
         System.out.println("Телефоны Петрова: " + phoneBook.get("Петров"));
         System.out.println("Телефоны Сидорова: " + phoneBook.get("Сидоров"));
     }
+
 }

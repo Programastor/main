@@ -11,6 +11,7 @@ public class Student {
         this.group = group;
         this.course = course;
         this.grades = grades;
+
     }
 
     public String getName() {
