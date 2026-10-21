@@ -11,7 +11,6 @@ public class EchoApiTest {
     // ========== 1. GET запрос ==========
     @Test
     public void testGetMethod() {
-        // Отправляем GET запрос с параметром foo1=bar1
         given()
                 .baseUri(BASE_URL)
                 .when()
