@@ -1,122 +1,94 @@
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import pages.MainPage;
+import pages.PaymentPage;
 
-import java.time.Duration;
-import java.util.List;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MtsTest {
-
     private WebDriver driver;
-    private WebDriverWait wait;
+    private MainPage mainPage;
+
+    private final String phone = "297777777";
+    private final double sum = 10;
+    private final String expectedAmount = String.format(Locale.US, "%.2f BYN", sum);
 
     @BeforeEach
     public void setUp() {
-
         WebDriverManager.chromedriver().setup();
-
         ChromeOptions options = new ChromeOptions();
-        // скрыть окно браузера :
         options.addArguments("--headless");
-
         driver = new ChromeDriver(options);
         driver.manage().window().maximize();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-
-        driver.get("https://www.mts.by/");
-
-
-        try {
-            WebElement cookieBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("cookie-agree")));
-            cookieBtn.click();
-        } catch (Exception e) {
-            System.out.println("Баннер кукисов не появился или уже закрыт.");
-        }
+        mainPage = new MainPage(driver);
+        mainPage.open();
     }
 
     @AfterEach
     public void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
+        if (driver != null) driver.quit();
     }
 
     @Test
-    public void testPaymentBlockTitle() {
-
-        WebElement title = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//section[@class='pay']//h2")
-        ));
-
-        assertEquals("ОНЛАЙН ПОПОЛНЕНИЕ\nБЕЗ КОМИССИИ", title.getText(),
-                "Текст заголовка блока не совпадает!");
-        System.out.println("✅ Пункт 1: Название блока проверено.");
+    public void testBlockTitle() {
+        assertEquals("ОНЛАЙН ПОПОЛНЕНИЕ\nБЕЗ КОМИССИИ", mainPage.getBlockTitleText());
     }
 
     @Test
-    public void testPaymentSystemLogos() {
-
-        List<WebElement> paymentSystems = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
-                By.xpath("//section[@class='pay']//ul/li/img")
-        ));
-
-
-        assertEquals(5, paymentSystems.size(), "Количество логотипов не совпадает!");
-
-
-        for (WebElement element : paymentSystems) {
-            assertTrue(element.isDisplayed(), "Один из логотипов не виден на экране!");
-        }
-        System.out.println("✅ Пункт 2: Логотипы проверены (найдено 5, все видимы).");
+    public void testPaymentLogos() {
+        assertTrue(mainPage.areAllLogosDisplayed(), "Не все логотипы видны!");
+        assertEquals(5, mainPage.getPaymentLogosCount());
     }
 
     @Test
-    public void testServiceDetailsLink() {
-
-        WebElement link = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//section[@class='pay']//a[contains(text(), 'Подробнее о сервисе')]")
-        ));
-
-        assertTrue(link.isDisplayed(), "Ссылка не видна!");
-        link.click();
-
-
-        wait.until(ExpectedConditions.urlContains("help/poryadok-oplaty-i-bezopasnost-internet-platezhey"));
-
-
-        assertEquals("https://www.mts.by/help/poryadok-oplaty-i-bezopasnost-internet-platezhey/",
-                driver.getCurrentUrl(), "Переход по ссылке произошел на неверный адрес!");
-        System.out.println("✅ Пункт 3: Ссылка работает, переход состоялся.");
+    public void testDetailsLink() {
+        mainPage.clickDetailsLink();
+        assertEquals("https://www.mts.by/help/poryadok-oplaty-i-bezopasnost-internet-platezhey/", mainPage.getCurrentUrl());
     }
 
     @Test
-    public void testSubmitPaymentForm() {
+    public void testPlaceholdersForTabs() {
+        mainPage.selectServiceType("Услуги связи");
+        assertEquals("Номер телефона", mainPage.getConnectionPhonePlaceholder());
+        assertEquals("Сумма", mainPage.getConnectionAmountPlaceholder());
+        assertEquals("E-mail для отправки чека", mainPage.getConnectionEmailPlaceholder());
 
-        WebElement fieldNumberPhone = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("connection-phone")));
-        fieldNumberPhone.click();
-        fieldNumberPhone.sendKeys("297777777");
+        mainPage.selectServiceType("Домашний интернет");
+        assertEquals("Номер абонента", mainPage.getInternetPhonePlaceholder());
 
-        WebElement fieldAmount = driver.findElement(By.id("connection-sum"));
-        fieldAmount.click();
-        fieldAmount.sendKeys("10");
+        mainPage.selectServiceType("Рассрочка");
+        assertEquals("Номер счета на 44", mainPage.getInstallmentAccountPlaceholder());
 
-        WebElement continueButton = driver.findElement(By.xpath("//section[@class='pay']//form[1]//button"));
-        assertTrue(continueButton.isEnabled(), "Кнопка 'Продолжить' неактивна!");
-        continueButton.click();
+        mainPage.selectServiceType("Задолженность");
+        assertEquals("Номер счета на 2073", mainPage.getArrearsAccountPlaceholder());
+    }
 
-        WebElement paymentWindow = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.payment-widget-app"))
-        );
-        assertTrue(paymentWindow.isDisplayed(), "Окно оплаты не появилось!");
-        System.out.println("✅ Пункт 4: Форма заполнена, кнопка сработала.");
+    @Test
+    public void testPaymentWidgetDetails() {
+        mainPage.selectServiceType("Услуги связи");
+        mainPage.fillPaymentForm(phone, String.valueOf(sum));
+
+        PaymentPage paymentPage = mainPage.clickContinue();
+
+        assertTrue(paymentPage.isPaymentWindowDisplayed(), "Виджет оплаты не появился!");
+
+        paymentPage.waitOfVisibilityFrame();
+
+        assertEquals(expectedAmount, paymentPage.getPaymentAmount(), "Сумма на странице не совпадает!");
+        assertTrue(paymentPage.getPaymentDetails().contains("375" + phone), "Номер телефона не найден!");
+
+        assertEquals("Номер карты", paymentPage.getCardNumberFieldLabel());
+        assertEquals("Срок действия", paymentPage.getCardExpirationFieldLabel());
+        assertEquals("CVC", paymentPage.getCardCvcFieldLabel());
+        assertEquals("Имя и фамилия на карте", paymentPage.getCardHolderFieldLabel());
+
+        assertTrue(paymentPage.getPaymentSystemIcons().size() >= 5, "Иконки платежных систем не найдены!");
+        assertTrue(paymentPage.getPaymentButtonText().contains(expectedAmount), "На кнопке нет суммы!");
     }
 }
