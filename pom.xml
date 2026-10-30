@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.release>17</maven.compiler.release> <!-- ВОТ ТАК -->
+        <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Версии зависимостей -->
@@ -17,7 +17,7 @@
         <junit.version>5.10.2</junit.version>
         <webdrivermanager.version>5.8.0</webdrivermanager.version>
         <allure.version>2.25.0</allure.version>
-        <aspectj.version>1.9.21</aspectj.version>
+        <aspectj.version>1.9.24</aspectj.version>
     </properties>
 
     <dependencies>
@@ -28,7 +28,7 @@
             <version>${selenium.version}</version>
         </dependency>
 
-        <!-- WebDriverManager (автоматическая загрузка драйверов) -->
+        <!-- WebDriverManager -->
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
@@ -57,15 +57,13 @@
 
         </dependency>
 
-        <!-- Allure для аннотаций и генерации -->
+        <!-- Allure для аннотаций (@Step, @DisplayName и т.д.) -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-java-commons</artifactId>
-            <version>2.25.0</version>
+            <version>${allure.version}</version>
 
         </dependency>
-
-
     </dependencies>
 
     <build>
@@ -77,20 +75,30 @@
                 <version>3.11.0</version>
             </plugin>
 
-            <!-- Плагин для запуска тестов JUnit 5 -->
+            <!-- Плагин для запуска тестов JUnit 5 с поддержкой Allure -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
+                    <!-- Агент AspectJ для перехвата шагов Allure -->
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                    </argLine>
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
-                    <!-- ВОТ ЭТА СТРОКА (говорим Allure, куда сохранять результаты) -->
                     <systemPropertyVariables>
                         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
                     </systemPropertyVariables>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <!-- Плагин для генерации отчета Allure -->

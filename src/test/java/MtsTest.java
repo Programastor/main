@@ -1,4 +1,5 @@
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -20,7 +21,7 @@ public class MtsTest {
 
     @BeforeEach
     public void setUp() {
-        WebDriverManager.chromedriver().setup(); // Наш подход к драйверу
+        WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
         driver = new ChromeDriver(options);
@@ -28,6 +29,7 @@ public class MtsTest {
 
         mainPage = new MainPage(driver);
         mainPage.open();
+        mainPage.closeCookieBanner(); // Добавили закрытие кукисов отдельным шагом
     }
 
     @AfterEach
@@ -37,17 +39,20 @@ public class MtsTest {
 
     // --- Базовые проверки ---
     @Test
+    @DisplayName("Проверка названия блока 'Онлайн пополнение'")
     public void testBlockTitle() {
         assertEquals("ОНЛАЙН ПОПОЛНЕНИЕ\nБЕЗ КОМИССИИ", mainPage.getBlockTitleText());
     }
 
     @Test
+    @DisplayName("Проверка отображения логотипов платежных систем")
     public void testPaymentLogos() {
         assertTrue(mainPage.areAllLogosDisplayed(), "Не все логотипы видны!");
         assertEquals(5, mainPage.getPaymentLogosCount());
     }
 
     @Test
+    @DisplayName("Проверка работы ссылки 'Подробнее о сервисе'")
     public void testDetailsLink() {
         mainPage.clickDetailsLink();
         assertEquals("https://www.mts.by/help/poryadok-oplaty-i-bezopasnost-internet-platezhey/", mainPage.getCurrentUrl());
@@ -55,6 +60,7 @@ public class MtsTest {
 
     // --- Проверка плейсхолдеров вкладок ---
     @Test
+    @DisplayName("Проверка плейсхолдеров на всех вкладках оплаты")
     public void testPlaceholdersForTabs() {
         mainPage.selectServiceType("Услуги связи");
         assertEquals("Номер телефона", mainPage.getConnectionPhonePlaceholder());
@@ -73,6 +79,7 @@ public class MtsTest {
 
     // --- Главный тест виджета (Iframe) ---
     @Test
+    @DisplayName("Проверка окна оплаты: сумма, телефон, поля карты, иконки")
     public void testPaymentWidgetDetails() {
         // 1. Заполняем форму
         mainPage.selectServiceType("Услуги связи");
@@ -84,7 +91,7 @@ public class MtsTest {
         // 3. Проверяем, что виджет появился
         assertTrue(paymentPage.isPaymentWindowDisplayed(), "Виджет оплаты не появился!");
 
-        // 4. Переключаемся в iframe (СЕКРЕТНЫЙ ИНГРЕДИЕНТ ИЗ ФАЙЛА)
+        // 4. Переключаемся в iframe
         paymentPage.waitOfVisibilityFrame();
 
         // 5. Теперь проверяем данные внутри фрейма
